@@ -7,6 +7,7 @@ const mongoose = require('mongoose')
 const customer = require('./routes/customer.js')
 const item = require('./routes/item.js')
 const cart = require('./routes/cart.js')
+const index = require('./routes/index.js')
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
@@ -21,6 +22,7 @@ db.once('open', function() {
 });
 
 //path
+app.use('/nile', index)
 app.use('/nile/customer', customer)
 app.use('/nile/item', item)
 app.use('/nile/cart', cart)
