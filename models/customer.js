@@ -1,5 +1,4 @@
 const mongoose = require('mongoose')
-mongoose.connect('mongodb://localhost:27017/shopping-cart', {useNewUrlParser:true});
 
 const Schema = mongoose.Schema
 const customerSchema = new Schema({
