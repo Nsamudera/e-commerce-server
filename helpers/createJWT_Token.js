@@ -4,6 +4,7 @@ require('dotenv').config()
 function createJWTToken(data) {
     return new Promise(function(resolve, reject) {
         let tokenContent = {
+            _id: data.id,
             email: data.email,
             role: data.role
         }

@@ -14,17 +14,19 @@ const itemSchema = new Schema({
         type: String,
         required: true
     },
-    // image: {
-    //     type: String,
-    //     required: true
-    // }
+    image: {
+        type: String,
+        required: true,
+        default: "//via.placeholder.com/600x400?text=Product"
+    },
     stock: {
         type: Number,
         required: true
     },
     category: {
-        type: String,
-        required: true
+        type: Schema.Types.ObjectId,
+        ref: 'Category',
+		required: true
     }
 })
 

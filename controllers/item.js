@@ -1,32 +1,74 @@
 const Item = require('../models/item.js')
+const Category = require('../models/category.js')
+
+const checkFileType = require('../helpers/checkFileType.js')
+//multer
+const multer  = require('multer')
+const path = require('path')
+
+//storage engine
+const storage = multer.diskStorage({
+  destination: './upload',
+  filename: function(req, file, cb) {
+    cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname))
+  }
+})
+
+//initi upload
+const upload = multer({
+  storage: storage,
+  fileFilter: function(req, file, cb) {
+    checkFileType(file, cb)
+  }
+}).single('image_upload')
+
 class Controller {
     static getItems(req, res) {
         Item
         .find()
+        .sort(
+            {
+                name: 1
+            }
+        )
+        .populate("category")
         .then(data => {
             res.status(200).json({data: data})
         })
         .catch(err => {
-            console.log('err')
+            console.log(err)
             res.status(500).json({message: err.message, note: 'Please see console log for details'})
         })
     }
     static addItem(req, res) {
-        let newItem = new Item ({
-            name: req.body.name,
-            price: req.body.price,
-            description: req.body.description,
-            stock: req.body.stock,
-            category: req.body.category
-        })
-        newItem.save(function (err) {
-            if (err) {
+        //check if category inputted exist
+        Category
+            .findById(req.body.category)
+            .then((data) => {
+                //if found
+                if(data) {
+                    let newItem = new Item ({
+                    name: req.body.name,
+                    price: req.body.price,
+                    description: req.body.description,
+                    stock: req.body.stock,
+                    category: req.body.category,
+                    image: req.body.image
+                    })
+                    return newItem
+                            .save()
+                            .then((data) => {
+                                res.status(201).json({message: 'Item succesfully added', data:newItem})
+                            })
+                //if not found; AKA null
+                } else {
+                    res.status(400).json({message: 'Category does not exist'})
+                }
+            })
+            .catch((err) => {
                 console.log(err)
-                res.status(500).json({ message: err.message, note: 'Please see console log for details' })
-            } else {
-                res.status(201).json({message: 'Item succesfully added'})
-            }
-        })
+                res.status(500).json({message: err.message, note: 'Please see console log for details'})
+            })
     }
     static editItem(req, res) {
         Item
@@ -71,6 +113,18 @@ class Controller {
                 console.log(err)
                 res.status(500).json({message: err.message, note: 'Please see console log for details'})
             })
+    }
+    static uploadImg(req, res) {
+        upload(req, res, (err) => {
+            if(err) {
+                console.log(err)
+                res.status(500).json({message: 'Upload fail'})
+            } else {
+                console.log(req.file)
+                res.redirect('back');
+            }
+
+        })
     }
 }
 

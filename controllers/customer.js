@@ -1,5 +1,6 @@
 //Model
-const Customer = require('../models/customer.js')
+const User = require('../models/user.js')
+const Cart = require('../models/cart.js')
 //Bcrypt
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
@@ -9,7 +10,7 @@ const createJWTToken = require('../helpers/createJWT_Token.js')
 class Controller {
     static signUp(req, res) {
         //check if email is unique
-        Customer
+        User
             .findOne({
                 email: req.body.email
             })
@@ -32,16 +33,28 @@ class Controller {
                             } else {
                                 hashedPass = req.body.password
                             }
-                            let newCustomer = new Customer({
+                            let newUser = new User({
                                 email: req.body.email,
                                 password: hashedPass,
+                                role: req.body.role
                             })
-                            newCustomer.save(function (err) {
+                            newUser.save(function (err) {
                                 if (err) {
                                     console.log(err)
                                     res.status(400).json({ message: err.message, note: 'Please see console log for details' })
                                 } else {
-                                    res.status(201).json({ message: `You have successfully signed up` })
+                                    //create empty cart for registered user
+                                    let newCart = new Cart({
+                                        customerId: newUser._id
+                                    })
+                                    newCart.save(function (err) {
+                                        if (err) {
+                                            console.log(err)
+                                            res.status(400).json({ message: err.message, note: 'Please see console log for details' })
+                                        } else {
+                                            res.status(201).json({message: `You have successfully signed up`, data: newUser})
+                                        }
+                                    })
                                 }
                             })
                         }
@@ -54,8 +67,8 @@ class Controller {
             })
     }
     static signIn(req, res) {
-        // find in database customer with email given
-        Customer
+        // find in database User with email given
+        User
             .findOne({
                 email: req.body.email
             })
@@ -70,11 +83,11 @@ class Controller {
                         if (result) {
                             return createJWTToken(data)
                                 .then(token => {
-                                    res.status(200).json({ message: 'Successfully signed in. Please take note of your token', token: token })
+                                    res.status(200).json({message: 'Successfully signed in. Please take note of your token', token: token, role: data.role})
                                 })
 
                         } else {
-                            res.status(400).json({ message: 'Password is incorrect' })
+                            res.status(400).json({message: 'Password is incorrect'})
                         }
 
                     }
