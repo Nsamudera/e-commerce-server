@@ -1,26 +1,29 @@
 const Item = require('../models/item.js')
 const Category = require('../models/category.js')
 
-const checkFileType = require('../helpers/checkFileType.js')
-//multer
-const multer  = require('multer')
-const path = require('path')
+// const checkFileType = require('../helpers/checkFileType.js')
+// //multer
+// const multer  = require('multer')
+// const path = require('path')
 
-//storage engine
-const storage = multer.diskStorage({
-  destination: './upload',
-  filename: function(req, file, cb) {
-    cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname))
-  }
-})
+// //storage engine
+// const storage = multer.diskStorage({
+//   destination: './upload',
+//   limits: {
+//     fileSize: 5 * 1024 * 1024 // no larger than 5mb
+//   },
+//   filename: function(req, file, cb) {
+//     cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname))
+//   }
+// })
 
-//initi upload
-const upload = multer({
-  storage: storage,
-  fileFilter: function(req, file, cb) {
-    checkFileType(file, cb)
-  }
-}).single('image_upload')
+// //initi upload
+// const upload = multer({
+//   storage: storage,
+//   fileFilter: function(req, file, cb) {
+//     checkFileType(file, cb)
+//   }
+// }).single('image_upload')
 
 class Controller {
     static getItems(req, res) {
@@ -102,7 +105,6 @@ class Controller {
             })
             .then(data => {
                 if(data.n !== 0) {
-                    console.log('ok')
                     res.status(200).json({message: "Data has been Deleted"})
                 } else {
                     console.log("item not found")
@@ -114,18 +116,17 @@ class Controller {
                 res.status(500).json({message: err.message, note: 'Please see console log for details'})
             })
     }
-    static uploadImg(req, res) {
-        upload(req, res, (err) => {
-            if(err) {
-                console.log(err)
-                res.status(500).json({message: 'Upload fail'})
-            } else {
-                console.log(req.file)
-                res.redirect('back');
-            }
-
-        })
-    }
+    // static uploadImg(req, res) {
+    //     upload(req, res, (err) => {
+    //         if(err) {
+    //             console.log(err)
+    //             res.status(500).json({message: 'Upload fail'})
+    //         } else {
+    //             console.log(req.file)
+    //             res.redirect('back');
+    //         }
+    //     })
+    // }
 }
 
 module.exports = Controller
