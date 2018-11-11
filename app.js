@@ -5,35 +5,13 @@ const mongoose = require('mongoose')
 const mongodbUri = 'mongodb://@ds151463.mlab.com:51463/shopping-cart'
 require('dotenv')
 const cors = require('cors')
-// //multer
-// const multer  = require('multer')
-// const path = require('path')
 
-// //storage engine
-// const storage = multer.diskStorage({
-//   destination: './upload',
-//   filename: function(req, file, cb) {
-//     cb(null, file.filename + '-' + Date.now() + path.extname(file.originalname))
-//   }
-// })
-
-// //initi upload
-// const upload = multer({
-//   storage: storage
-// }).single('image_upload')
-
-// app.post('/upload', (req, res) => {
-//   upload(req, res, (err) => {
-//     if(err) {
-//       console.log(err)
-//     } else {
-//       console.log(req.file)
-//       res.send('test')
-//     }
-//   })
-// })
-
-
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
 
 //routes
 const user = require('./routes/user.js')
@@ -68,9 +46,6 @@ app.use('/nile/item', item)
 app.use('/nile/category', category)
 app.use('/nile/cart', cart)
 
-
 app.listen(port, () => {
     console.log(`Listening to port ${port}`);
 })
-
-
